@@ -375,7 +375,7 @@ END IF;
 -- 02 DEFERIDO
 -- 03 REJEITADO ADMINISTRATIVAMENTE - PARA DEFESA E ADVERT MANTEM O 03, PARA JARI E CETRAN CONVERTE PARA 5 (Regra alterada em: 04/02/2026)
 
-IF P_COD_RESULTADO NOT IN ('01','02','03','1','2','3') THEN
+IF P_COD_RESULTADO NOT IN ('01','02','05','1','2','5') THEN
     P_COD_RETORNO := 3;
     P_MENSAGEM :=  'Codigo de resultado invalido '||P_COD_RESULTADO;
     GOTO SAIDA;
@@ -384,7 +384,7 @@ END IF;
 W_COD_RSLT := TO_NUMBER(P_COD_RESULTADO);
 
 IF P_TIPOSERV = '02'  AND -- SOL ADVERTENCIA
-    W_COD_RSLT = 3 THEN  -- REJEITADO ADMINISTRATIVAMENTE -- Alterada em 04/02/2026
+    W_COD_RSLT = 5 THEN  -- REJEITADO ADMINISTRATIVAMENTE -- Alterada em 04/02/2026
     -- P_COD_RETORNO := 3;
     -- P_MENSAGEM :=  'Codigo de resultado invalido para Sol. Advertencia: '||P_COD_RESULTADO;
     -- GOTO SAIDA;
@@ -395,7 +395,7 @@ END IF;
 
 
 IF P_TIPOSERV = '04'  AND -- CETRAN
-     W_COD_RSLT = 3 THEN  -- REJEITADO ADMINISTRATIVAMENTE -- Alterada em 04/02/2026
+     W_COD_RSLT = 5 THEN  -- REJEITADO ADMINISTRATIVAMENTE -- Alterada em 04/02/2026
    -- P_COD_RETORNO := 3;
    -- P_MENSAGEM :=  'Codigo de resultado invalido para Recurso Cetran: '||P_COD_RESULTADO;
    -- GOTO SAIDA;
@@ -407,7 +407,7 @@ END IF;
 
 -- P_JUSTIFICATIVA
 
-IF  W_COD_RSLT = 3 AND -- Alterada em 04/02/2026
+IF  W_COD_RSLT = 5 AND -- Alterada em 04/02/2026
    ( P_JUSTIFICATIVA IS NULL  OR
     LENGTH(P_JUSTIFICATIVA) > 2 ) THEN
     P_COD_RETORNO := 4;
@@ -417,15 +417,15 @@ END IF;
 
 /*
 1-Falta assinatura
-2-Faltam documentos obrigatÃ³rios
-7- Defesa nÃ£o condiz com a autuaÃ§Ã£o
-8-NÃ£o se trata de recurso de multa
+2-Faltam documentos obrigatórios
+7- Defesa não condiz com a autuação
+8-Não se trata de recurso de multa
 11-Ilegitimidade de parte
 99-Outros motivos conforme parecer
 */
 
 
-IF W_COD_RSLT = 3 THEN -- Alterada em 04/02/2026
+IF W_COD_RSLT = 5 THEN -- Alterada em 04/02/2026
 
     W_COD_MTVO := TO_NUMBER(P_JUSTIFICATIVA);
 
@@ -446,9 +446,9 @@ IF W_COD_RSLT = 3 THEN -- Alterada em 04/02/2026
 
   IF P_TIPOSERV IN ( '01','02') THEN  -- DEFESA OU SOL. ADVERTENCIA
 
-      /*IF W_COD_RSLT = 5 THEN - Alterado em 04/02/2026
-          W_COD_RSLT := 3;
-      END IF;*/
+      IF W_COD_RSLT = 5 THEN -- Alterado em 04/02/2026
+          W_COD_RSLT := 3; -- O RESULTADO REJEITADO ADMINISTRATIVAMENTE DA DEFESA = 3 E NAO 5
+      END IF;
 
       IF W_COD_MTVO = 1 THEN
           W_COD_MTVO := 4;
@@ -470,9 +470,10 @@ IF W_COD_RSLT = 3 THEN -- Alterada em 04/02/2026
 
   -- Alteradom em 04/02/2026
   IF P_TIPOSERV IN ( '03') THEN  -- RECURSO JARI
-      IF W_COD_RSLT = 3 THEN
-          W_COD_RSLT := 5;
-      END IF;
+      -- retirado em 08/05/2026  
+      --IF W_COD_RSLT = 3 THEN
+      --    W_COD_RSLT := 5;
+      --END IF;
 
       IF W_COD_MTVO = 11 THEN
           W_COD_MTVO := 12;
